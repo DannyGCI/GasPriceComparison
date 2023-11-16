@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>/* Add your custom styles here */body { font-family: Arial, sans-serif; text-align: center; } .calculator { max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); } input, select, button { margin: 10px 0; padding: 10px; width: 100%; box-sizing: border-box; }</style>
+    </head>
+    <body>
+        <div class="calculator">
+            <h2>Fuel Price Calculator</h2>
+            <label for="gasPriceUS">Gas Price in the US (USD):</label>
+            <input type="text" id="gasPriceUS" placeholder="Enter gas price in USD">
+            <label for="gasPriceMexico">Gas Price in Mexico (Pesos):</label>
+            <input type="text" id="gasPriceMexico" placeholder="Enter gas price in pesos">
+            <button onclick="calculate()">Calculate</button>
+            <h3>Results:</h3>
+            <p id="pricePerLiterUS"></p>
+            <p id="pricePerLiterMexico"></p>
+        </div>
+        <script>
+  // Constant unit conversion value
+  const unitConversion = 3.78541;
+
+  function calculate() {
+    // Get input values
+    var gasPriceUS = parseFloat(document.getElementById('gasPriceUS').value);
+    var gasPriceMexico = parseFloat(document.getElementById('gasPriceMexico').value);
+
+    // Fetch live exchange rate
+    getLiveExchangeRate()
+      .then((exchangeRate) => {
+        // Perform calculations
+        var pricePerLiterUS = gasPriceUS / unitConversion;
+        var pricePerLiterMexico = gasPriceMexico / exchangeRate;
+
+        // Display results
+        document.getElementById('pricePerLiterUS').innerHTML = 'Cost per Liter in the US (USD): $' + pricePerLiterUS.toFixed(2);
+        document.getElementById('pricePerLiterMexico').innerHTML = 'Cost per Liter in Mexico (USD): $' + pricePerLiterMexico.toFixed(2);
+      })
+      .catch((error) => {
+        console.error('Error fetching exchange rate:', error);
+      });
+  }
+
+  function getLiveExchangeRate() {
+    // Replace 'YOUR_API_KEY' with the API key you obtained
+    const apiKey = 'bb07a34defc744ffb66c93f9e3c8ca20';
+    const apiUrl = `https://open.er-api.com/v6/latest/USD?apikey=${apiKey}`;
+
+    return fetch(apiUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        return data.rates.MXN; // Exchange rate for USD to Mexican Peso
+      });
+  }
+</script>
+    </body>
+</html>
